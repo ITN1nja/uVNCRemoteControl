@@ -18,15 +18,18 @@ DataSection
 EndDataSection
 ;}
 
-;  ***************************
-;  * Create global variables *
-;{ ***************************
+;  ********************************
+;  * Create global variables      *
+;  * ITN1nja added:               *
+;  * searchstring.s, searchindex  *
+;{ ********************************
 Global flip1, flip2, flip3, flip4, flip5, flip6, flip7, flip8, flip9, flip10
 Global flip11, flip12, flip13, flip14, flip15, flip16, flip17, flip18, flip19
 Global flip20, flip21, flip22, flip23, flip24, flip25, flip26, flip27, flip28
 Global flip29, flip30, flip31, flip32, flip33
 Global lastx, lasty, logme
-Global myhostname.s, pcname.s, mydescription.s
+Global myhostname.s, pcname.s, mydescription.s, searchstring.s
+Global searchindex
 Global totalItemsSelected
 Global is.LVHITTESTINFO
 Global Ping_Port = IcmpCreateFile_()
@@ -63,6 +66,7 @@ Enumeration
 #Connect_Button
 #Text_Search
 #String_Search
+#Next_Button
 #StatusBar0
 ;Server Options Panel
 #Frame_1
@@ -504,6 +508,17 @@ Next
 PasswordHash.s = strCode
 ProcedureReturn PasswordHash
 EndProcedure
+
+;Attempt to step through Host list in search box
+; -Added by ITN1nja
+Procedure NextButton()
+  searchstring=GetGadgetText(#String_HostName)
+  serchindex=searchindex+1
+  
+  
+  
+EndProcedure
+
 ;}
 
 ;     =========
@@ -1590,9 +1605,11 @@ PanelGadget(#Panel_1,0,0,453,430)
   ButtonGadget(#Connect_Button,336,317,100,75,"Connect")
   HyperLinkGadget(#Text_Search,10,377,40,20,"Search:",#Blue)
    BalloonTip(#Window_0,#Text_Search,"Click to clear the search field","",#MB_ICONINFORMATION)
-   StringGadget(#String_Search,80,375,250,20,"")
+   StringGadget(#String_Search,80,375,200,20,"")
     SendMessage_(GadgetID(#String_Search),#EM_SETCUEBANNER,#True,@"Enter Search Parameters")
    AddKeyboardShortcut(#Window_0,#PB_Shortcut_Return,#Menu_EnterKey)
+; Added by ITN1nja   
+   ButtonGadget(#Next_Button,283,375,42,20,"Next")  
 CreateStatusBar(#StatusBar0, WindowID(#Window_0))
 AddStatusBarField(#PB_Ignore)
 StatusBarText(#StatusBar0,0,"Ready",#PB_StatusBar_Center)
@@ -1952,7 +1969,12 @@ Repeat
 
        Case #Connect_Button
          SetGadgetText(#String_Search,"")
-          ConnectHostButton()
+         ConnectHostButton()
+         
+; Added by ITN1nja         
+       Case #Next_Button
+         GetGadgetText(#String_Search)
+         NextButton()
 
        Case #String_Search
          If EventType()=#PB_EventType_Change
@@ -1963,6 +1985,8 @@ Repeat
                 SetGadgetText(#String_Description,"")
               Else
                 SetGadgetText(#String_Description,GetGadgetItemText(#Hosts_List,GetGadgetState(#Hosts_List),1))
+                ; Added by ITN1nja to enable stepping through search term in Hosts list
+                searchindex=1
               EndIf
          EndIf
 ;}
@@ -2669,10 +2693,10 @@ DataSection
 
 EndDataSection 
 ;}
-; IDE Options = PureBasic 5.72 (Windows - x64)
-; CursorPosition = 1908
-; FirstLine = 29
-; Folding = AAAAAAAAEAw
+; IDE Options = PureBasic 5.73 LTS (Windows - x64)
+; CursorPosition = 1982
+; FirstLine = 844
+; Folding = 8gAeEj-s5Dj
 ; EnableThread
 ; EnableXP
 ; UseIcon = includes\Icon.ico
